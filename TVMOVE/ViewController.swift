@@ -38,6 +38,7 @@ class ViewController: UIViewController {
         setUI()
         bindViewModel()
         bindVIew()
+        setDatasource()
         
         tvTrigger.onNext(())
     }
@@ -45,8 +46,6 @@ class ViewController: UIViewController {
     private func setUI() {
         self.view.addSubview(buttonView)
         self.view.addSubview(collectionView)
-        
-        collectionView.backgroundColor = .blue
         
         buttonView.snp.makeConstraints {
             $0.top.leading.trailing.equalTo(self.view.safeAreaLayoutGuide)
@@ -64,8 +63,13 @@ class ViewController: UIViewController {
         
         let output = viewModel.transform(input: input)
         
-        output.tvList.bind { tvList in
-            print("TV List \(tvList)")
+        output.tvList.bind { [weak self] tvList in
+            var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+            let items = tvList.map { return Item.normal($0) }
+            let section = Section.double
+            snapshot.appendSections([section])
+            snapshot.appendItems(items, toSection: section)
+            self?.datasource?.apply(snapshot)
         }.disposed(by: disposeBag)
         
         output.movieResult.bind { movieResult in
@@ -93,9 +97,9 @@ class ViewController: UIViewController {
     }
     
     private func createDoubleSection() -> NSCollectionLayoutSection {
-        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .fractionalHeight(1.0))
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 8, trailing: 4)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 8, bottom: 8, trailing: 8)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(320))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item, item])
@@ -114,6 +118,5 @@ class ViewController: UIViewController {
             }
         })
     }
-
 }
 

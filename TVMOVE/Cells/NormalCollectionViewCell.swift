@@ -50,7 +50,7 @@ class NormalCollectionViewCell: UICollectionViewCell {
         
         image.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(140)
+            $0.height.equalToSuperview().multipliedBy(0.7)
         }
         
         titleLabel.snp.makeConstraints {
