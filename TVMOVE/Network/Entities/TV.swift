@@ -14,7 +14,7 @@ struct TVListModel: Decodable {
 }
 
 
-struct TV: Decodable {
+struct TV: Decodable, Hashable {
     let name: String
     let overview: String
     let posterURL: String
@@ -36,8 +36,8 @@ struct TV: Decodable {
         overview = try container.decode(String.self, forKey: .overview)
         let path = try container.decode(String.self, forKey: .posterPath)
         posterURL = "https://image.tmdb.org/t/p/w500\(path)"
-        let voteAverage = try container.decode(String.self, forKey: .voteAverage)
-        let voteCount = try container.decode(String.self, forKey: .voteCount)
+        let voteAverage = try container.decode(Float.self, forKey: .voteAverage)
+        let voteCount = try container.decode(Int.self, forKey: .voteCount)
         vote = "\(voteAverage)(\(voteCount))"
         firstAirDate = try container.decode(String.self, forKey: .firstAirDate)
     }

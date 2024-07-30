@@ -9,19 +9,37 @@ import UIKit
 import SnapKit
 import RxSwift
 
+enum Section: Hashable {
+    case double
+}
+
+enum Item: Hashable {
+    case normal(TV)
+}
+
 class ViewController: UIViewController {
     let disposeBag = DisposeBag()
     let buttonView = ButtonView()
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout())
     let viewModel = ViewModel()
     
     let tvTrigger = PublishSubject<Void>()
     let movieTrigger = PublishSubject<Void>()
     
+    private var datasource: UICollectionViewDiffableDataSource<Section, Item>?
+    
+    lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayout())
+        collectionView.register(NormalCollectionViewCell.self, forCellWithReuseIdentifier: NormalCollectionViewCell.identifier)
+        return collectionView
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
         bindViewModel()
+        bindVIew()
+        
+        tvTrigger.onNext(())
     }
     
     private func setUI() {
@@ -47,7 +65,11 @@ class ViewController: UIViewController {
         let output = viewModel.transform(input: input)
         
         output.tvList.bind { tvList in
-                print(tvList)
+            print("TV List \(tvList)")
+        }.disposed(by: disposeBag)
+        
+        output.movieResult.bind { movieResult in
+            print("Movie Result \(movieResult)")
         }.disposed(by: disposeBag)
     }
     
@@ -55,6 +77,42 @@ class ViewController: UIViewController {
         buttonView.tvButton.rx.tap.bind { [weak self] in
             self?.tvTrigger.onNext(Void())
         }.disposed(by: disposeBag)
+        
+        buttonView.movieButton.rx.tap.bind { [weak self] in
+            self?.movieTrigger.onNext(Void())
+        }.disposed(by: disposeBag)
+    }
+    
+    
+    private func createLayout() -> UICollectionViewCompositionalLayout {
+        let config = UICollectionViewCompositionalLayoutConfiguration()
+        config.interSectionSpacing = 14
+        return UICollectionViewCompositionalLayout(sectionProvider: { [weak self]sectionIndex, _ in
+            return self?.createDoubleSection()
+        }, configuration: config)
+    }
+    
+    private func createDoubleSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 8, trailing: 4)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(320))
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item, item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        return section
+    }
+    
+    private func setDatasource() {
+        datasource = UICollectionViewDiffableDataSource<Section, Item>(collectionView: collectionView, cellProvider: { collectionView, indexPath, item in
+            switch item {
+            case .normal(let tvData):
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NormalCollectionViewCell.identifier, for: indexPath) as? NormalCollectionViewCell
+                cell?.configure(title: tvData.name, review: tvData.vote, desc: tvData.overview, imageURL: tvData.posterURL)
+                return cell
+            }
+        })
     }
 
 }

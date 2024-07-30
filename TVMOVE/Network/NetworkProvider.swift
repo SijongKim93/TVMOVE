@@ -13,7 +13,7 @@ import Foundation
 final class NetworkProvider {
     private let endpoint: String
     
-    init(endpoint: String) {
+    init() {
         self.endpoint = "https://api.themoviedb.org/3"
     }
     
