@@ -27,6 +27,7 @@ class ViewController: UIViewController {
     let buttonView = ButtonView()
     let viewModel = ViewModel()
     
+    
     let tvTrigger = PublishSubject<Void>()
     let movieTrigger = PublishSubject<Void>()
     
@@ -66,6 +67,7 @@ class ViewController: UIViewController {
         }
     }
     
+    // MARK: - 뷰 바인드
     private func bindViewModel() {
         let input = ViewModel.Input(tvTrigger: tvTrigger.asObservable(), movieTrigger: movieTrigger.asObservable())
         
@@ -125,7 +127,7 @@ class ViewController: UIViewController {
         config.interSectionSpacing = 14
         return UICollectionViewCompositionalLayout(sectionProvider: { [weak self]sectionIndex, _ in
             let section = self?.dataSource?.sectionIdentifier(for: sectionIndex)
-            
+
             switch section {
             case .banner:
                 return self?.createBannerSeciton()
@@ -230,7 +232,6 @@ class ViewController: UIViewController {
             default:
                 print("Default")
             }
-            
             return header
         }
     }
