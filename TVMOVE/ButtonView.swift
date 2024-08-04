@@ -38,11 +38,15 @@ class ButtonView: UIView {
         
         tvButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(40)
+            $0.width.equalTo(120)
+            $0.height.equalTo(50)
+            $0.leading.equalTo(10)
         }
         
         movieButton.snp.makeConstraints {
             $0.centerY.equalToSuperview()
+            $0.width.equalTo(120)
+            $0.height.equalTo(50)
             $0.leading.equalTo(tvButton.snp.trailing).offset(10)
         }
     }
