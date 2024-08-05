@@ -26,22 +26,20 @@ class ViewModel {
     
     struct Output {
         let tvList: Observable<[TV]>
-        let movieResult: Observable<MovieResult>
+        let movieResult: Observable<Result<MovieResult, Error>>
     }
     
     func transform(input: Input) -> Output {
-        
-        // trigger -> 네트워크 -> Observable<T> -> VC 전달 -> VC에서 구독
         
         let tvList = input.tvTrigger.flatMapLatest {[unowned self] _ -> Observable<[TV]> in
             return self.tvNetwork.getTopRatedList().map{ $0.results }
         }
         
-        let movieResult = input.movieTrigger.flatMapLatest { [unowned self] _ -> Observable<MovieResult> in
-            // combineLatest
-            // 하나의 옵저버블로 리턴해줄 수 있다.
-            return Observable.combineLatest(self.movieNetwork.getUpcomingList(), self.movieNetwork.getPopularList(), self.movieNetwork.getNowPlayingList()) { upcoming, popular, nowPlaying -> MovieResult in
-                return MovieResult(upcomming: upcoming, popular: popular, nowPlaying: nowPlaying)
+        let movieResult = input.movieTrigger.flatMapLatest { [unowned self] _ -> Observable<Result<MovieResult, Error>> in
+            return Observable.combineLatest(self.movieNetwork.getUpcomingList(), self.movieNetwork.getPopularList(), self.movieNetwork.getNowPlayingList()) { upcoming, popular, nowPlaying -> Result<MovieResult, Error> in
+                    .success(MovieResult(upcomming: upcoming, popular: popular, nowPlaying: nowPlaying))
+            }.catch { error in
+                return Observable.just(.failure(error))
             }
         }
         
