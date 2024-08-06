@@ -30,7 +30,6 @@ class ViewModel {
     }
     
     func transform(input: Input) -> Output {
-        
         let tvList = input.tvTrigger.flatMapLatest {[unowned self] _ -> Observable<[TV]> in
             return self.tvNetwork.getTopRatedList().map{ $0.results }
         }
@@ -42,7 +41,6 @@ class ViewModel {
                 return Observable.just(.failure(error))
             }
         }
-        
         return Output(tvList: tvList, movieResult: movieResult)
     }
 }

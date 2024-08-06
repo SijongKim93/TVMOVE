@@ -16,12 +16,10 @@ final class NetworkProvider {
     init() {
         self.endpoint = "https://api.themoviedb.org/3"
     }
-    
     func makeTVNetwork() -> TVNetwork {
         let network = Network<TVListModel>(endpoint)
         return TVNetwork(network: network)
     }
-    
     func makeMovieNetwork() -> MovieNetwork {
         let network = Network<MovieListModel>(endpoint)
         return MovieNetwork(network: network)
