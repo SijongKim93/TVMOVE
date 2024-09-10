@@ -19,11 +19,13 @@ class ViewModel {
         movieNetwork = provider.makeMovieNetwork()
     }
     
+    //input
     struct Input {
         let tvTrigger: Observable<Void>
         let movieTrigger: Observable<Void>
     }
     
+    //output
     struct Output {
         let tvList: Observable<[TV]>
         let movieResult: Observable<Result<MovieResult, Error>>
